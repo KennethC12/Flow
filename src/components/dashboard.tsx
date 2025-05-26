@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Sidebar } from "../components/sidebar"
-import { TaskView } from "../components/task-view"
+import { TaskView } from "./tasks"
 import { CalendarView } from "../components/calendar-view"
 import { TimeBlockView } from "../components/time-block-view"
 

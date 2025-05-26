@@ -1,7 +1,15 @@
 "use client"
 
-import { CalendarDays, CheckSquare, Clock, Settings } from "lucide-react"
+import { CalendarDays, CheckSquare, Clock, LogOut, User } from "lucide-react"
 import { Button } from "../components/ui/button"
+import { useAuth } from "../components/auth/auth-context"
+import { supabase } from "../server/db"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu"
 
 type View = "tasks" | "calendar" | "timeblock"
 
@@ -11,6 +19,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, setCurrentView }: SidebarProps) {
+  const { user } = useAuth()
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
+
   return (
     <div className="w-64 border-r bg-muted/10 p-4 flex flex-col h-full">
       <div className="mb-8">
@@ -45,11 +59,21 @@ export function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         </Button>
       </nav>
 
-      <div className="mt-auto">
-        <Button variant="ghost" className="w-full justify-start">
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </Button>
+      <div className="mt-auto border-t pt-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start">
+              <User className="mr-2 h-4 w-4" />
+              {user?.email?.split('@')[0] || 'Profile'}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )
