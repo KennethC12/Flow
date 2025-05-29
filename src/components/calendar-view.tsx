@@ -1,19 +1,73 @@
 "use client"
 
 import type React from "react"
-
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "../components/ui/button"
-import type { TimeBlock } from "./dashboard"
+import { NewEventModal } from './modal'
+import { useAuth } from '@/components/auth/auth-context'
+import { useState, useEffect } from 'react'
+import { getTasks, getCalendarEvents } from '@/server/db/queries'
 
-interface CalendarViewProps {
-  timeBlocks: TimeBlock[]
-  setTimeBlocks: React.Dispatch<React.SetStateAction<TimeBlock[]>>
-  currentDate: Date
-  setCurrentDate: React.Dispatch<React.SetStateAction<Date>>
+interface CalendarItem {
+  id: string
+  title: string
+  date: string
+  type: 'task' | 'event'
+  color: string
 }
 
-export function CalendarView({ timeBlocks, setTimeBlocks, currentDate, setCurrentDate }: CalendarViewProps) {
+export function CalendarView() {
+  const { user } = useAuth()
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const [calendarItems, setCalendarItems] = useState<CalendarItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchCalendarItems = async () => {
+    if (!user) return
+    try {
+      setLoading(true)
+      const [tasks, events] = await Promise.all([
+        getTasks(user.id),
+        getCalendarEvents(user.id)
+      ])
+
+      // Convert tasks to calendar items
+      const taskItems: CalendarItem[] = tasks
+        .filter(task => task.due_date)
+        .map(task => ({
+          id: task.id,
+          title: task.title,
+          date: new Date(task.due_date!).toISOString().split('T')[0],
+          type: 'task',
+          color: 'bg-blue-100 text-blue-800'
+        }))
+
+      // Convert events to calendar items
+      const eventItems: CalendarItem[] = events
+        .filter(event => event.start_time)
+        .map(event => ({
+          id: event.id,
+          title: event.title || 'Untitled Event',
+          date: new Date(event.start_time).toISOString().split('T')[0],
+          type: 'event',
+          color: 'bg-purple-100 text-purple-800'
+        }))
+
+      setCalendarItems([...taskItems, ...eventItems])
+      setError(null)
+    } catch (err) {
+      setError('Failed to fetch calendar items')
+      console.error('Error fetching calendar items:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchCalendarItems()
+  }, [user])
+
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay()
 
@@ -33,10 +87,10 @@ export function CalendarView({ timeBlocks, setTimeBlocks, currentDate, setCurren
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
   }
 
-  // Function to get timeblocks for a specific day
-  const getTimeBlocksForDay = (day: number) => {
+  // Function to get items for a specific day
+  const getItemsForDay = (day: number) => {
     const dateString = formatDateString(currentDate.getFullYear(), currentDate.getMonth(), day)
-    return timeBlocks.filter((block) => block.date === dateString)
+    return calendarItems.filter((item) => item.date === dateString)
   }
 
   // Add this to the beginning of the CalendarView component
@@ -46,13 +100,19 @@ export function CalendarView({ timeBlocks, setTimeBlocks, currentDate, setCurren
     window.dispatchEvent(new CustomEvent("navigateToTimeBlock", { detail: { date: dayDate } }))
   }
 
+  if (loading) {
+    return <div className="max-w-4xl mx-auto p-4">Loading calendar...</div>
+  }
+
+  if (error) {
+    return <div className="max-w-4xl mx-auto p-4 text-red-500">{error}</div>
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Calendar</h2>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> New Event
-        </Button>
+        <NewEventModal onEventCreated={fetchCalendarItems} />
       </div>
 
       <div className="flex justify-between items-center mb-4">
@@ -88,7 +148,7 @@ export function CalendarView({ timeBlocks, setTimeBlocks, currentDate, setCurren
             currentDate.getMonth() === today.getMonth() &&
             currentDate.getFullYear() === today.getFullYear()
 
-          const dayTimeBlocks = getTimeBlocksForDay(day)
+          const dayItems = getItemsForDay(day)
 
           // Create a new date object for this day
           const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
@@ -105,13 +165,13 @@ export function CalendarView({ timeBlocks, setTimeBlocks, currentDate, setCurren
                 <span className={`text-sm font-medium ${isToday ? "text-primary" : ""}`}>{day}</span>
               </div>
               <div className="mt-1 space-y-1">
-                {dayTimeBlocks.map((block) => (
+                {dayItems.map((item) => (
                   <div
-                    key={block.id}
-                    className={`text-xs p-1 ${block.color} rounded truncate`}
-                    title={`${block.title} - ${block.startTime} to ${block.endTime}`}
+                    key={item.id}
+                    className={`text-xs p-1 ${item.color} rounded truncate`}
+                    title={`${item.title} (${item.type})`}
                   >
-                    {block.startTime} - {block.title}
+                    {item.title}
                   </div>
                 ))}
               </div>

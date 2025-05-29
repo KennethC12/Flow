@@ -95,22 +95,8 @@ export default function Dashboard() {
       <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
       <main className="flex-1 overflow-auto p-4">
         {currentView === "tasks" && <TaskView />}
-        {currentView === "calendar" && (
-          <CalendarView
-            timeBlocks={timeBlocks}
-            setTimeBlocks={setTimeBlocks}
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-          />
-        )}
-        {currentView === "timeblock" && (
-          <TimeBlockView
-            timeBlocks={timeBlocks}
-            setTimeBlocks={setTimeBlocks}
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-          />
-        )}
+        {currentView === "calendar" && <CalendarView />}
+        {currentView === "timeblock" && <TimeBlockView />}
       </main>
     </div>
   )

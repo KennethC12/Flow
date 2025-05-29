@@ -156,3 +156,34 @@ export async function getStudyAnalytics(userId: string, timePeriod: 'daily' | 'w
   if (error) throw error
   return data
 }
+
+export async function createCalendarEvent(event: {
+  user_id: string,
+  title: string,
+  description?: string,
+  event_type?: string,
+  subject?: string,
+  location?: string,
+  start_time: string,
+  end_time: string,
+  is_all_day?: boolean,
+  color?: string,
+  related_task_id?: string
+}) {
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .insert([event])
+    .select()
+  if (error) throw error
+  return data[0]
+}
+
+export async function getCalendarEvents(userId: string) {
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .select('*')
+    .eq('user_id', userId)
+    .order('start_time', { ascending: true })
+  if (error) throw error
+  return data
+}
