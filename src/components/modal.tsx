@@ -19,10 +19,19 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
   const [dueDate, setDueDate] = useState('')
 
   const handleSubmit = async () => {
-    if (!user) return
+    if (!user) {
+      console.error('No user found')
+      return
+    }
+    
+    if (!title.trim()) {
+      console.error('Title is required')
+      return
+    }
     
     try {
-      await createTask({
+      console.log('Creating task with:', { user_id: user.id, title, description, due_date: dueDate })
+      const result = await createTask({
         user_id: user.id,
         title,
         description,
@@ -42,6 +51,7 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
         parent_task_id: null,
         completed_at: null
       })
+      console.log('Task created successfully:', result)
       setOpen(false)
       // Reset form
       setTitle('')
@@ -51,6 +61,7 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
       onTaskCreated?.()
     } catch (error) {
       console.error('Failed to create task:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
     }
   }
 
@@ -91,10 +102,19 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
   const [description, setDescription] = useState('')
 
   const handleSubmit = async () => {
-    if (!user) return
+    if (!user) {
+      console.error('No user found for event creation')
+      return
+    }
+    
+    if (!title.trim() || !start || !end) {
+      console.error('Title, start time, and end time are required for events')
+      return
+    }
     
     try {
-      await createCalendarEvent({
+      console.log('Creating event with:', { user_id: user.id, title, start_time: start, end_time: end })
+      const result = await createCalendarEvent({
         user_id: user.id,
         title,
         description,
@@ -102,6 +122,7 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
         end_time: end,
         // add other fields as needed
       })
+      console.log('Event created successfully:', result)
       setOpen(false)
       // Reset form
       setTitle('')
@@ -112,6 +133,7 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
       onEventCreated?.()
     } catch (error) {
       console.error('Failed to create event:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
     }
   }
 
@@ -152,10 +174,19 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
   const [end, setEnd] = useState('')
 
   const handleSubmit = async () => {
-    if (!user) return
+    if (!user) {
+      console.error('No user found for timeblock creation')
+      return
+    }
+    
+    if (!name.trim() || !start || !end) {
+      console.error('Name, start time, and end time are required for timeblocks')
+      return
+    }
     
     try {
-      await createStudySession({
+      console.log('Creating timeblock with:', { user_id: user.id, title: name, start_time: start, end_time: end })
+      const result = await createStudySession({
         user_id: user.id,
         session_type: 'timeblock',
         title: name,
@@ -174,6 +205,7 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
         related_task_id: null,
         environment_data: {}
       })
+      console.log('Timeblock created successfully:', result)
       setOpen(false)
       // Reset form
       setName('')
@@ -183,6 +215,7 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
       onTimeblockCreated?.()
     } catch (error) {
       console.error('Failed to create timeblock:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
     }
   }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { CalendarDays, CheckSquare, Clock, LogOut, User } from "lucide-react"
+import { CalendarDays, CheckSquare, Clock, LogOut, User, Dumbbell } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { useAuth } from "../components/auth/auth-context"
 import { supabase } from "../server/db"
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu"
 
-type View = "tasks" | "calendar" | "timeblock"
+type View = "tasks" | "calendar" | "timeblock" | "workout"
 
 interface SidebarProps {
   currentView: View
@@ -56,6 +56,14 @@ export function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         >
           <Clock className="mr-2 h-4 w-4" />
           Time Blocking
+        </Button>
+        <Button
+          variant={currentView === "workout" ? "default" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => setCurrentView("workout")}
+        >
+          <Dumbbell className="mr-2 h-4 w-4" />
+          Workout
         </Button>
       </nav>
 

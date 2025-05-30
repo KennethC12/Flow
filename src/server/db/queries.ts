@@ -5,6 +5,7 @@ type Tables = Database['public']['Tables']
 type User = Tables['users']['Row']
 type Task = Tables['tasks']['Row']
 type StudySession = Tables['study_sessions']['Row']
+type UserWorkout = Tables['user_workouts']['Row']
 
 // User queries
 export async function getUser(userId: string) {
@@ -186,4 +187,59 @@ export async function getCalendarEvents(userId: string) {
     .order('start_time', { ascending: true })
   if (error) throw error
   return data
+}
+
+export async function createUserWorkout(workout: Omit<UserWorkout, 'id' | 'created_at' | 'updated_at' | 'completed_at'>) {
+  const { data, error } = await supabase
+    .from('user_workouts')
+    .insert([workout])
+    .select()
+    .single();
+  if (error) throw error;
+  return data as UserWorkout;
+}
+
+export async function completeUserWorkout(workoutId: string) {
+  const { data, error } = await supabase
+    .from('user_workouts')
+    .update({ completed: true, completed_at: new Date().toISOString() })
+    .eq('id', workoutId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as UserWorkout;
+}
+
+export async function getUserWorkoutsForWeek(userId: string, weekStart: string, weekEnd: string) {
+  const { data, error } = await supabase
+    .from('user_workouts')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('workout_date', weekStart)
+    .lte('workout_date', weekEnd)
+    .order('workout_date', { ascending: true });
+  if (error) throw error;
+  return data as UserWorkout[];
+}
+
+export async function updateUserWorkoutProgress(workoutId: string, setProgress: number, notes: string) {
+  const { data, error } = await supabase
+    .from('user_workouts')
+    .update({ 
+      notes,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', workoutId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as UserWorkout;
+}
+
+export async function deleteUserWorkout(workoutId: string) {
+  const { error } = await supabase
+    .from('user_workouts')
+    .delete()
+    .eq('id', workoutId);
+  if (error) throw error;
 }
