@@ -257,82 +257,13 @@ export function WorkoutView() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Today's Workout</h1>
-          <p className="text-muted-foreground">Complete your exercises and track your progress</p>
-        </div>
-        
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Exercise
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Exercise</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Quick Templates</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {workoutTemplates.map((template, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => useTemplate(template)}
-                      className="text-xs"
-                    >
-                      {template.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <Input
-                placeholder="Exercise name"
-                value={newExercise.exercise_name}
-                onChange={(e) => setNewExercise({...newExercise, exercise_name: e.target.value})}
-              />
-              
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  placeholder="Sets"
-                  min={1}
-                  value={newExercise.sets}
-                  onChange={(e) => setNewExercise({...newExercise, sets: Number(e.target.value)})}
-                />
-                <Input
-                  type="number"
-                  placeholder="Duration (min)"
-                  value={newExercise.duration_minutes || ""}
-                  onChange={(e) => setNewExercise({...newExercise, duration_minutes: e.target.value ? Number(e.target.value) : null})}
-                />
-              </div>
-              
-              <Input
-                placeholder="YouTube URL (optional)"
-                value={newExercise.video_url}
-                onChange={(e) => setNewExercise({...newExercise, video_url: e.target.value})}
-              />
-              
-              <Input
-                type="date"
-                value={newExercise.workout_date}
-                onChange={(e) => setNewExercise({...newExercise, workout_date: e.target.value})}
-              />
-              
-              <Button onClick={handleCreateExercise} className="w-full">
-                Add Exercise
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Workout Tracker</h2>
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Workout
+        </Button>
       </div>
 
       <div className="grid gap-4">
@@ -460,6 +391,71 @@ export function WorkoutView() {
           </span>
         </div>
       </div>
+
+      {/* Create Workout Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Exercise</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Quick Templates</label>
+              <div className="grid grid-cols-2 gap-2">
+                {workoutTemplates.map((template, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => useTemplate(template)}
+                    className="text-xs"
+                  >
+                    {template.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            <Input
+              placeholder="Exercise name"
+              value={newExercise.exercise_name}
+              onChange={(e) => setNewExercise({...newExercise, exercise_name: e.target.value})}
+            />
+            
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                placeholder="Sets"
+                min={1}
+                value={newExercise.sets}
+                onChange={(e) => setNewExercise({...newExercise, sets: Number(e.target.value)})}
+              />
+              <Input
+                type="number"
+                placeholder="Duration (min)"
+                value={newExercise.duration_minutes || ""}
+                onChange={(e) => setNewExercise({...newExercise, duration_minutes: e.target.value ? Number(e.target.value) : null})}
+              />
+            </div>
+            
+            <Input
+              placeholder="YouTube URL (optional)"
+              value={newExercise.video_url}
+              onChange={(e) => setNewExercise({...newExercise, video_url: e.target.value})}
+            />
+            
+            <Input
+              type="date"
+              value={newExercise.workout_date}
+              onChange={(e) => setNewExercise({...newExercise, workout_date: e.target.value})}
+            />
+            
+            <Button onClick={handleCreateExercise} className="w-full">
+              Add Exercise
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

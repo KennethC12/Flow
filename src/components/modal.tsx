@@ -17,17 +17,22 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!user) {
-      console.error('No user found')
+      setError('No user found. Please log in.')
       return
     }
     
     if (!title.trim()) {
-      console.error('Title is required')
+      setError('Title is required')
       return
     }
+    
+    setLoading(true)
+    setError(null)
     
     try {
       console.log('Creating task with:', { user_id: user.id, title, description, due_date: dueDate })
@@ -61,7 +66,9 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
       onTaskCreated?.()
     } catch (error) {
       console.error('Failed to create task:', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
+      setError(`Failed to create task: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -79,9 +86,14 @@ export function NewTaskModal({ onTaskCreated }: NewTaskModalProps) {
           <Input placeholder="Title" value={title} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} />
           <Textarea placeholder="Description" value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} />
           <Input type="datetime-local" placeholder="Due Date" value={dueDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDueDate(e.target.value)} />
+          {error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )}
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Save Task</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Creating...' : 'Save Task'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -100,17 +112,22 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
   const [description, setDescription] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!user) {
-      console.error('No user found for event creation')
+      setError('No user found. Please log in.')
       return
     }
     
     if (!title.trim() || !start || !end) {
-      console.error('Title, start time, and end time are required for events')
+      setError('Title, start time, and end time are required for events')
       return
     }
+    
+    setLoading(true)
+    setError(null)
     
     try {
       console.log('Creating event with:', { user_id: user.id, title, start_time: start, end_time: end })
@@ -133,7 +150,9 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
       onEventCreated?.()
     } catch (error) {
       console.error('Failed to create event:', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
+      setError(`Failed to create event: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -152,9 +171,14 @@ export function NewEventModal({ onEventCreated }: NewEventModalProps) {
           <Input type="datetime-local" placeholder="Start Time" value={start} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStart(e.target.value)} />
           <Input type="datetime-local" placeholder="End Time" value={end} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnd(e.target.value)} />
           <Textarea placeholder="Description" value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} />
+          {error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )}
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Save Event</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Creating...' : 'Save Event'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -172,17 +196,22 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
   const [name, setName] = useState('')
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!user) {
-      console.error('No user found for timeblock creation')
+      setError('No user found. Please log in.')
       return
     }
     
     if (!name.trim() || !start || !end) {
-      console.error('Name, start time, and end time are required for timeblocks')
+      setError('Name, start time, and end time are required for timeblocks')
       return
     }
+    
+    setLoading(true)
+    setError(null)
     
     try {
       console.log('Creating timeblock with:', { user_id: user.id, title: name, start_time: start, end_time: end })
@@ -215,7 +244,14 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
       onTimeblockCreated?.()
     } catch (error) {
       console.error('Failed to create timeblock:', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
+      console.error('Error type:', typeof error)
+      console.error('Error constructor:', (error as any)?.constructor?.name)
+      console.error('Error message:', (error as any)?.message)
+      console.error('Error stack:', (error as any)?.stack)
+      console.error('Full error object:', JSON.stringify(error, null, 2))
+      setError(`Failed to create timeblock: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -233,9 +269,14 @@ export function NewTimeblockModal({ onTimeblockCreated }: NewTimeblockModalProps
           <Input placeholder="Name" value={name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} />
           <Input type="datetime-local" placeholder="Start" value={start} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStart(e.target.value)} />
           <Input type="datetime-local" placeholder="End" value={end} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnd(e.target.value)} />
+          {error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )}
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Save Timeblock</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Creating...' : 'Save Timeblock'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

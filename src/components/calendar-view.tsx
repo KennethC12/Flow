@@ -95,9 +95,10 @@ export function CalendarView() {
 
   // Add this to the beginning of the CalendarView component
   const handleDayClick = (dayDate: Date) => {
-    setCurrentDate(dayDate)
+    console.log('Calendar day clicked:', dayDate)
+    console.log('Date to navigate to:', dayDate.toISOString())
     // Navigate to timeblock view when clicking on a day
-    window.dispatchEvent(new CustomEvent("navigateToTimeBlock", { detail: { date: dayDate } }))
+    window.dispatchEvent(new CustomEvent("navigateToTimeBlock", { detail: { date: dayDate.toISOString() } }))
   }
 
   if (loading) {

@@ -18,12 +18,25 @@ interface TimeBlock {
   color: string
 }
 
-export function TimeBlockView() {
+interface TimeBlockViewProps {
+  selectedDate?: Date
+}
+
+export function TimeBlockView({ selectedDate }: TimeBlockViewProps) {
   const { user } = useAuth()
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState(selectedDate || new Date())
   const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Update currentDate when selectedDate prop changes
+  useEffect(() => {
+    console.log('TimeBlockView: selectedDate prop changed:', selectedDate)
+    if (selectedDate) {
+      console.log('TimeBlockView: Setting currentDate to:', selectedDate)
+      setCurrentDate(selectedDate)
+    }
+  }, [selectedDate])
 
   function getLocalDateString(date: Date) {
     return date.getFullYear() + '-' +

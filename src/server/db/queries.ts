@@ -112,13 +112,21 @@ export async function getStudySessions(userId: string, filters?: {
 }
 
 export async function createStudySession(session: Omit<StudySession, 'id' | 'created_at'>) {
+  console.log('createStudySession called with:', session);
+  console.log('Supabase client available:', !!supabase);
+  
   const { data, error } = await supabase
     .from('study_sessions')
     .insert(session)
     .select()
     .single()
   
-  if (error) throw error
+  console.log('createStudySession result:', { data, error });
+  
+  if (error) {
+    console.error('createStudySession error details:', error);
+    throw error;
+  }
   return data as StudySession
 }
 

@@ -26,6 +26,20 @@ if (process.env.NODE_ENV !== 'production') {
     globalForSupabase.supabase = supabase;
 }
 
+// Test the connection
+(async () => {
+  try {
+    const { data, error } = await supabase.from('users').select('count').limit(1);
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+    } else {
+      console.log('Supabase connection test successful');
+    }
+  } catch (err: any) {
+    console.error('Supabase connection test error:', err);
+  }
+})();
+
 // Handle auth state changes
 supabase.auth.onAuthStateChange((event, session) => {
     switch (event) {

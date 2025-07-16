@@ -194,6 +194,56 @@ export interface Database {
           created_at?: string
         }
       }
+      calendar_events: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          event_type: string | null
+          subject: string | null
+          location: string | null
+          start_time: string
+          end_time: string
+          is_all_day: boolean
+          color: string | null
+          related_task_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          event_type?: string | null
+          subject?: string | null
+          location?: string | null
+          start_time: string
+          end_time: string
+          is_all_day?: boolean
+          color?: string | null
+          related_task_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          event_type?: string | null
+          subject?: string | null
+          location?: string | null
+          start_time?: string
+          end_time?: string
+          is_all_day?: boolean
+          color?: string | null
+          related_task_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       user_workouts: {
         Row: {
           id: string
